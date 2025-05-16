@@ -213,4 +213,4 @@ type AbstractBool = FlatLattice Bool
 
 -- | Repeatedly apply a function to a value until it reaches a fixpoint
 fixpoint :: Eq a => (a -> a) -> a -> a
-fixpoint f x = let x' = f x in if x' == x then x else f x'
+fixpoint f x = let x' = f x in if x' == x then x else fixpoint f x'
