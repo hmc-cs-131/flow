@@ -1,14 +1,14 @@
 module AbstractSyntax.CFG (CFG, fromAST, root, successors, nodes, edges) where
 
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Data.List
+import           Data.List
+import           Data.Map           (Map)
+import qualified Data.Map           as Map
+import           Data.Set           (Set)
+import qualified Data.Set           as Set
 
-import AbstractSyntax.AST
+import           AbstractSyntax.AST
 
--- | The type of a node in the CFG 
+-- | The type of a node in the CFG
 type NodeType = (LineNumber, Statement)
 
 -- | A control-flow-graph for a program
@@ -42,7 +42,7 @@ successors :: CFG -> NodeType -> [NodeType]
 successors (CFG m) n = Map.findWithDefault (error ("Unknown node" ++ show n)) n m
 
 --  Given a line number and a statement, computes the list of line numbers that can come
---  next 
+--  next
 lineSuccessors :: NodeType -> [LineNumber]
 lineSuccessors (_, Goto l') = [l']
 lineSuccessors (l, If _ l') = [l', l+1]

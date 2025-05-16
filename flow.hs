@@ -2,21 +2,21 @@
 
 module Main where
 
-import Parser.Parser (parseFile, parseNamed)
-import AbstractSyntax.AST
-import Semantics.ConcreteSemantics
-import Semantics.Dot
-import Semantics.Domains
+import           AbstractSyntax.AST
+import           Parser.Parser               (parseFile, parseNamed)
+import           Semantics.ConcreteSemantics
+import           Semantics.Domains
+import           Semantics.Dot
 
-import           Data.Map (Map)
-import qualified Data.Map as Map
-import System.Console.CmdArgs
-import System.Environment
-import System.Exit
-import Control.Monad
+import           Control.Monad
+import           Data.Map                    (Map)
+import qualified Data.Map                    as Map
+import           System.Console.CmdArgs
+import           System.Environment
+import           System.Exit
 
 -----------------------------------------------------------------------------------------
--- Handle command-line arguments 
+-- Handle command-line arguments
 -----------------------------------------------------------------------------------------
 data FlowArgs = Run { file :: FilePath, show_store :: Bool }
               | Dot { file :: FilePath }
@@ -26,23 +26,23 @@ data FlowArgs = Run { file :: FilePath, show_store :: Bool }
 runArgs :: FlowArgs
 runArgs =  Run { file = def &= argPos 0 &= typ "PROGRAM" &= opt ""
                , show_store = False }
-        &= help "Run the program" 
+        &= help "Run the program"
         &= auto
 
 -- flow dot [PROGRAM]
 dotArgs :: FlowArgs
-dotArgs =  Dot { file = def &= argPos 0 &= typ "PROGRAM" &= opt "" }  
+dotArgs =  Dot { file = def &= argPos 0 &= typ "PROGRAM" &= opt "" }
         &= help "Render the program in dot notation"
 
-mode = modes [runArgs, dotArgs] 
+mode = modes [runArgs, dotArgs]
      &= program "flow"
      &= help "The flow programming language"
 
 -----------------------------------------------------------------------------------------
--- Run the program 
+-- Run the program
 -----------------------------------------------------------------------------------------
 runProgram :: Program -> Bool -> IO ()
-runProgram program displayStore = 
+runProgram program displayStore =
   do (_, σ) <- doProgram program
      when displayStore $
       print σ
@@ -54,10 +54,10 @@ printDot :: Program -> IO ()
 printDot = putStrLn . makeDot
 
 -----------------------------------------------------------------------------------------
--- Main 
+-- Main
 -----------------------------------------------------------------------------------------
 main :: IO ()
-main = do 
+main = do
           -- Process the command-line arguments
           args <- cmdArgs mode
 

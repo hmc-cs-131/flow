@@ -1,15 +1,15 @@
 module Semantics.Dot where
 
-import AbstractSyntax.AST
-import AbstractSyntax.CFG
+import           AbstractSyntax.AST
+import           AbstractSyntax.CFG
 
 -- | Produce a dot graph from a program
 makeDot :: Program -> String
-makeDot p = unlines $ 
-     ["Digraph G {"] 
+makeDot p = unlines $
+     ["Digraph G {"]
   ++    [indent ++ "node [shape=box]"]
   ++    map edge (edges cfg)
-  ++    map node (nodes cfg) 
+  ++    map node (nodes cfg)
   ++ ["}"]
   where cfg = fromAST p
 

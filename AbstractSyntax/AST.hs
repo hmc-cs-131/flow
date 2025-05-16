@@ -1,8 +1,8 @@
 module AbstractSyntax.AST where
 
-import Data.List
-import Data.Map (Map)
-import qualified Data.Map as Map 
+import           Data.List
+import           Data.Map  (Map)
+import qualified Data.Map  as Map
 
 -----------------------------------------------------------------------------------------
 -- * Domains
@@ -13,7 +13,7 @@ type Value        = Integer  -- ^ The semantic domain is Integers
 type LineNumber   = Integer  -- ^ Line numbers are integers
 
 -----------------------------------------------------------------------------------------
--- * Statements 
+-- * Statements
 -----------------------------------------------------------------------------------------
 
 data Statement = Assign VariableName Term            -- ^ x := term
@@ -27,7 +27,7 @@ data Statement = Assign VariableName Term            -- ^ x := term
   deriving (Eq, Ord)
 
 -----------------------------------------------------------------------------------------
--- * Terms 
+-- * Terms
 -----------------------------------------------------------------------------------------
 
 -- | A term is either a variable or a number
@@ -36,7 +36,7 @@ data Term = Var VariableName
   deriving (Eq, Ord)
 
 -----------------------------------------------------------------------------------------
--- * Arithmetic Expressions 
+-- * Arithmetic Expressions
 -----------------------------------------------------------------------------------------
 
 -- | An arithmetic expression performs an arithmetic operation on two terms
@@ -48,7 +48,7 @@ data AOp = Plus | Minus | Times | Divide
   deriving (Eq, Ord)
 
 -----------------------------------------------------------------------------------------
--- * Conditions 
+-- * Conditions
 -----------------------------------------------------------------------------------------
 
 -- | A condition compares the value of a variable to the value of a term
@@ -60,7 +60,7 @@ data ROp = Equal | LessThan
   deriving (Eq, Ord)
 
 -----------------------------------------------------------------------------------------
--- * Programs 
+-- * Programs
 -----------------------------------------------------------------------------------------
 
 -- | A program maps line numbers to statements
@@ -69,7 +69,7 @@ newtype Program = Program (Map LineNumber Statement)
 
 -- | Construct a program from a list of statements
 mkProgram :: [Statement] -> Program
-mkProgram statements =              
+mkProgram statements =
   let lineNumbers = [1..(fromIntegral . length) statements]
       pairs = zip lineNumbers statements in
     foldl addStatement blankProgram pairs
@@ -91,24 +91,24 @@ getLines :: Program -> [(LineNumber, Statement)]
 getLines (Program p)= Map.assocs p
 
 -----------------------------------------------------------------------------------------
--- Showing ASTs 
+-- Showing ASTs
 -----------------------------------------------------------------------------------------
 
 instance Show Program where
-  show p = 
+  show p =
     let programLines = sortBy (\ (l1, _) (l2, _) -> compare l1 l2) (getLines p)
         statements = map snd programLines in
           intercalate "\n" (map show statements)
 
 instance Show Statement where
-  show (Assign name term)       = name ++ " := " ++ show term
-  show (AssignExpr name arith)  = name ++ " := " ++ show arith
-  show (Input name)             = "input " ++ name
-  show (Print name)             = "print " ++ name
-  show (Goto l)                 = "goto "  ++ show l
-  show (If cond l)              = "if " ++ show cond ++ " goto " ++ show l
-  show Skip                     = "skip"
-  show Halt                     = "halt"
+  show (Assign name term)      = name ++ " := " ++ show term
+  show (AssignExpr name arith) = name ++ " := " ++ show arith
+  show (Input name)            = "input " ++ name
+  show (Print name)            = "print " ++ name
+  show (Goto l)                = "goto "  ++ show l
+  show (If cond l)             = "if " ++ show cond ++ " goto " ++ show l
+  show Skip                    = "skip"
+  show Halt                    = "halt"
 
 instance Show Term where
   show (Var name) = name
@@ -124,7 +124,7 @@ instance Show AOp where
   show Divide = " / "
 
 instance Show Condition where
-  show (Cond name op term) = name ++ show op ++ show term 
+  show (Cond name op term) = name ++ show op ++ show term
 
 instance Show ROp where
   show Equal    = " == "

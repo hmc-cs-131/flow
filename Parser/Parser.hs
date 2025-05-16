@@ -1,11 +1,11 @@
 module Parser.Parser (parse, parseFile, parseNamed, program) where
 
-import Text.Parsec
-import Text.Parsec.Char
-import qualified Text.Parsec.Token as Token
-import qualified Data.Map as Map 
+import qualified Data.Map           as Map
+import           Text.Parsec
+import           Text.Parsec.Char
+import qualified Text.Parsec.Token  as Token
 
-import AbstractSyntax.AST
+import           AbstractSyntax.AST
 
 --------------------------------------------------------------------------------
 -- * Parsing functions
@@ -18,17 +18,17 @@ parseFile filename = readFile filename >>= parseNamed filename
 -- | Parse a Flow program, given a name for the source of the program and a string that
 --   contains the contents of the programs
 parseNamed :: String -> String -> IO Program
-parseNamed name contents = 
+parseNamed name contents =
   case parse program name contents of
     Right ast -> return ast
     Left err  -> errorWithoutStackTrace (show err)
 
 
 -----------------------------------------------------------------------------------------
--- Basic domains: variables, line numbers, and values 
+-- Basic domains: variables, line numbers, and values
 -----------------------------------------------------------------------------------------
 identifier = Token.identifier lexer     -- ^  x ∈ Variables
-lineNumber = Token.natural lexer        -- ^  l ∈ Line numbers 
+lineNumber = Token.natural lexer        -- ^  l ∈ Line numbers
 number     = Token.integer lexer        -- ^  n ∈ ℤ
 
 
@@ -115,7 +115,7 @@ arithOp =  (op "+" >>: Plus)
 
 -- | cond ∈ Conditional expressions ::= x rop term
 condition :: Parsec String () Condition
-condition = 
+condition =
   do var <- identifier
      op  <- relativeOp
      operand <- term

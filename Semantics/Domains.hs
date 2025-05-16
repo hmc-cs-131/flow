@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances  #-}
+{-# LANGUAGE FlexibleInstances #-}
 
 {-
   Inspired by http://matt.might.net/articles/partial-orders/
@@ -6,14 +6,14 @@
 
 module Semantics.Domains where
 
-import AbstractSyntax.AST
+import           AbstractSyntax.AST
 
-import Data.Map (Map)
-import qualified Data.Map as Map
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Data.Maybe
-import Data.List
+import           Data.List
+import           Data.Map           (Map)
+import qualified Data.Map           as Map
+import           Data.Maybe
+import           Data.Set           (Set)
+import qualified Data.Set           as Set
 
 -----------------------------------------------------------------------------------------
 -- * Concrete domains
@@ -23,7 +23,7 @@ type ConcreteStore = Store ConcreteValue
 instance ValueStore ConcreteValue
 
 -----------------------------------------------------------------------------------------
--- * Stores 
+-- * Stores
 -----------------------------------------------------------------------------------------
 
 -- | A store maps variables names to values
@@ -49,7 +49,7 @@ class ValueStore a where
 
   -- | Look up a given variable name in a given store
   resolve :: VariableName -> Store a -> a
-  resolve x (Store s) = 
+  resolve x (Store s) =
     Map.findWithDefault (errorWithoutStackTrace ("Unknown variable " ++ x)) x s
 
   -- | Bind a variable name to a value, in a store
@@ -66,7 +66,7 @@ class ValueStore a where
   (↦) = (,)
 
 -----------------------------------------------------------------------------------------
--- * Abstract Domains 
+-- * Abstract Domains
 -----------------------------------------------------------------------------------------
 
 -- | A lattice for the type a (which defines a set of values)
@@ -90,7 +90,7 @@ class Lattice a where
 
 
   -- ** Text aliases: text equivalents of the symbolic values and functions
-  
+
     -- | Equivalent to ⊥
   bottom :: a
   bottom = (⊥)
@@ -112,24 +112,24 @@ class Lattice a where
 -- * Flat lattices
 -----------------------------------------------------------------------------------------
 
--- | A flat lattice is a way to construct a lattice from an existing type. 
+-- | A flat lattice is a way to construct a lattice from an existing type.
 --
 --   For example, @FlatLattice Integer@ gives us the lattice
 --
 --               Top
---           /  / | \  \ 
+--           /  / | \  \
 --        ...  -1 0 1  ...
 --            \ \ | /  /
 --             Bottom
 data FlatLattice a = Bottom       -- ^ The least element
                    | Top          -- ^ The greatest element
                    | Element a    -- ^ An element of a as a lattice value
-  deriving (Eq)                   
+  deriving (Eq)
 
 -- Displaying FlatLattices
 instance (Show a) => Show (FlatLattice a) where
-  show Bottom = "⊥"
-  show Top = "⊤"
+  show Bottom      = "⊥"
+  show Top         = "⊤"
   show (Element v) = "«" ++ show v ++ "»"
 
 instance Ord a => Ord (FlatLattice a) where
@@ -140,15 +140,15 @@ instance Eq a => Lattice (FlatLattice a) where
   (⊥) = Bottom
   (⊤) = Top
 
-  Bottom ⊑ _ = True
-  _ ⊑ Top = True
+  Bottom ⊑ _                  = True
+  _ ⊑ Top                     = True
   (Element v1) ⊑ (Element v2) = v1 == v2
-  _ ⊑ _ = False
+  _ ⊑ _                       = False
 
-  Bottom ⊔ right = right
-  left ⊔ Bottom = left
-  Top ⊔ _ = Top
-  _ ⊔ Top = Top
+  Bottom ⊔ right              = right
+  left ⊔ Bottom               = left
+  Top ⊔ _                     = Top
+  _ ⊔ Top                     = Top
   (Element v1) ⊔ (Element v2) = if v1 == v2 then Element v1 else Top
 
 -----------------------------------------------------------------------------------------
@@ -167,13 +167,13 @@ instance (Lattice a, Lattice b) => Lattice (a, b) where
   (⊥) = ((⊥), (⊥))
   (⊤)    = ((⊤), (⊤))
   (a1, b1) ⊑ (a2, b2) = (a1 ⊑ a2) && (b1 ⊑ b2)
-  (a1, b1) ⊔ (a2, b2) = (a1 ⊔ a2, b1 ⊔ b2) 
-  
+  (a1, b1) ⊔ (a2, b2) = (a1 ⊔ a2, b1 ⊔ b2)
+
 -- A Map is a Lattice (if they type of its values is a lattice)
 instance (Ord a, Lattice b) => Lattice (Map a b) where
   (⊥) = Map.empty
   (⊤) = error "There is no representation of the top map"
-  (⊑) = Map.isSubmapOfBy lte 
+  (⊑) = Map.isSubmapOfBy lte
   (⊔) = Map.unionWith join
 
 -- A Store is a lattice (if its values are lattices)
@@ -205,7 +205,7 @@ instance Eq a => ValueStore (FlatLattice a) where
   bind x v (Store s) = Store $ weakUpdate x v s
 
 -----------------------------------------------------------------------------------------
--- Misc 
+-- Misc
 -----------------------------------------------------------------------------------------
 
 -- | A flat Bool lattice
